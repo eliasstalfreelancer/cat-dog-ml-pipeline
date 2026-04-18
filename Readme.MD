@@ -37,7 +37,7 @@ The project includes:
 
   * Images resized to 300x280
   * Converted to grayscale
-  * HOG feature extraction (~44,000 features per image)
+  * HOG and LBP feature extraction, 
   * Invalid/corrupted images removed
 
 ---
