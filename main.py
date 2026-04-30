@@ -41,4 +41,8 @@ list_of_models= [
  AdaBoostClassifier()
 
 ]
-pl.model_create_save_compare(list_of_models,"models/")
+traindata_data_desc = {
+        "HOG_LPB": "data/ShuffledHOG_LBP.csv",
+    }
+for name,traindata in traindata_data_desc.items():
+    pl.model_create_save_compare(list_of_models,"models/",name=name,data_path=traindata)

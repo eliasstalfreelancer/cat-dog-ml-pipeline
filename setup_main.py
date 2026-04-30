@@ -25,17 +25,6 @@ import model as ml
 import pipline as pl
 print("done reading python files")
 import pandas as pd 
-
-print("loading data")
-df = pd.read_csv("data/shuffleddata.csv", nrows=10000)
-print(df.head())
-X = df.drop(columns=["animal"])
-print("starting train_test_spilt")
-X_train, X_test, y_train, y_test = pl.train_test_split_for_model(df=df)
-print("starting create preprocessor")
-preprocessor = pl.create_preprocessor(X)
-print("done pre")
-
 list_of_models= [
  LogisticRegression(),
  HistGradientBoostingClassifier(),
@@ -58,21 +47,40 @@ list_of_models= [
  AdaBoostClassifier()
 
 ]
+traindata_data_desc = {
+        "HOG": "data/Shuffled_HOG.csv",
+        "LPB": "data/Shuffled_LBP.csv",
+    }
+for name,traindata in traindata_data_desc.items():
+    print("loading data")
+    df = pd.read_csv(traindata, nrows=10000)
+    print(df.head())
+    X = df.drop(columns=["animal","file"])
+    print("starting train_test_spilt")
+    X_train, X_test, y_train, y_test = pl.train_test_split_for_model(df=df)
+    print("starting create preprocessor")
+    preprocessor = pl.create_preprocessor(X)
+    print("done pre")
 
-res =[]
-for model in list_of_models:
-    print()
-    print("starting " + str(model))
-    Pipeline = ml.model_creater_and_run(preprocessor,model)
-    print("model created done")
-    score = pl.cross_validation(X_train=X_train,y_train=y_train,model =Pipeline)
-    print("score is done")
-    res.append({
-        "score": score,
-        "model": str(model)
-    })
-    print("finnished " + str(model))
-df = pd.DataFrame(res)
-df = df.sort_values(by="score",ascending=False)
-df.to_csv("data/model_data.csv")
-print("done")
+
+
+    res =[]
+    
+
+    for model in list_of_models:
+        print()
+        print("starting " + str(model))
+        Pipeline = ml.model_creater_and_run(preprocessor,model)
+        print("model created done")
+        score = pl.cross_validation(X_train=X_train,y_train=y_train,model =Pipeline)
+        print("score is done")
+        res.append({
+            "score": score,
+            f"model {name}":str(model),
+            
+        })
+        print("finnished " + str(model))
+    df = pd.DataFrame(res)
+    df = df.sort_values(by="score",ascending=False)
+    df.to_csv("data/model_data.csv",mode="a")
+    print("done")

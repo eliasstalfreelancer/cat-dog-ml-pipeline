@@ -1,15 +1,11 @@
 print("start model import")
 from sklearn.linear_model import LogisticRegression
-
 from sklearn.model_selection import GridSearchCV
-
 import pipline as pl
-
-
 
 print("imoprts loaded")
 def baseline_model(preprocessor):
-    return pl.create_pipeline(preprocessor,LogisticRegression(max_iter=100000))
+    return pl.create_pipeline(preprocessor,LogisticRegression(max_iter=250000))
 
 print("base loaded")
 def model_creater_and_run(preprocessor,model,random_state = 42):
@@ -17,7 +13,7 @@ def model_creater_and_run(preprocessor,model,random_state = 42):
        output = pl.create_pipeline(preprocessor,model(random_state=random_state))
     except:
         try:
-            output = pl.create_pipeline(preprocessor,model(max_iter=100000))
+            output = pl.create_pipeline(preprocessor,model(max_iter=250000))
         except:
             output = pl.create_pipeline(preprocessor,model)
     return output

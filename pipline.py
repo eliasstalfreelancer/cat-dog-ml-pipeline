@@ -15,6 +15,7 @@ import tools
 def train_test_split_for_model(
         df: pd.DataFrame,
         target_column="animal",
+        file_column = "file",
         test_size=0.2,
         random_state=42
     ):
@@ -77,27 +78,24 @@ def cross_validation(X_train, y_train, model
     return results
 
 
-def model_create_save_compare(list_of_model_name,save_path, data_path= "data/shuffleddata.csv",nrows = 9000,target_colum ="animal"):
+def model_create_save_compare(list_of_model_name,save_path, data_path= "data/shuffleddata.csv",nrows = 9000,target_colum ="animal",name=None):
     var = tools.time_lapsed()
     print("loading data")
     df = pd.read_csv(data_path, nrows=nrows)
     var = tools.time_lapsed(var)
     print(f"Done loading data: timetook {var[-1]}:{var[-2]}:{var[-3]}:{var[-4]}")
-    X = df.drop(columns=[target_colum])
+    X = df.drop(columns=[target_colum,"file"])
     print("starting train_test_spilt")
     X_train, X_test, y_train, y_test = train_test_split_for_model(df=df)
     print("starting create preprocessor")
     preprocessor = create_preprocessor(X)
     print("done pre")
-    if "model_data.csv" in os.listdir("data/"):
-        res = pd.read_csv("data/model_data.csv").to_dict("records")
-    else:
-        res =[]
+   
     saved_models_list = []
     for path in os.listdir(save_path):
          saved_models_list.append(path)
     for model in list_of_model_name:
-        if not str(model)+".pkl" in saved_models_list:
+        if not f"{str(model)}_{name}.pkl" in saved_models_list:
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
                 print("starting " + str(model))
@@ -107,19 +105,25 @@ def model_create_save_compare(list_of_model_name,save_path, data_path= "data/shu
                 score = cross_validation(X_train=X_train,y_train=y_train,model =Pipeline)
                 
                 var = tools.time_lapsed(var)
-                print(f"score is done : timetook {var[-1]}:{var[-2]}:{var[-3]}:{var[-4]}")
-                
-                res.append({
-                    "score": score,
-                    "model": str(model),
-                    "time (Day:Hours:Minutes:Secunds)": f"{var[-1]}:{var[-2]}:{var[-3]}:{var[-4]}",
-                    "Warning" : w
-                })
-                print("finnished " + str(model))
-                df = pd.DataFrame(res)
-                df = df.sort_values(by="score",ascending=False)
-                df.to_csv("data/model_data.csv",index=False)
-                joblib.dump(Pipeline,save_path+str(model)+".pkl")
+                time_str =f"{var[-1]}:{var[-2]}:{var[-3]}:{var[-4]}"
+                print(f"score is done : timetook {time_str}")
+                file = "data/model_data.csv"
+                file_exists = os.path.exists(file)
+                row = pd.DataFrame([{
+                        "score": score,
+                        "model": str(model),
+                        "feature_method": name,
+                        "time DD:HH:MM:SS": time_str,
+                        "Warning": w
+                    }])
+
+                row.to_csv(
+                        file,
+                        mode="a",
+                        header=not file_exists,
+                        index=False
+                    )
+                joblib.dump(Pipeline,f"{save_path}{str(model)}_{name}.pkl")
         else:
             print("skiping " + str(model))
         
