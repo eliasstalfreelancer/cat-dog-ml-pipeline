@@ -11,7 +11,6 @@ import numpy as np
 
 
 def image_to_feature(df:pd.DataFrame,img,full_path, features_func):
-    rows = []
     
     data = {"animal":[]}
     
@@ -127,6 +126,8 @@ def run_pipeline(animals = ["Dog","Cat"],
 
 
 def interleave_csv(cat_path, dog_path, output_path, chunksize=50):
+    if os.path.exists(output_path):
+        return print("skiping mergeing. file already exsist")
     cat_reader = pd.read_csv(cat_path, chunksize=chunksize)
     dog_reader = pd.read_csv(dog_path, chunksize=chunksize)
 
