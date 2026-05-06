@@ -18,27 +18,11 @@ def model_creater_and_run(preprocessor,model,random_state = 42):
             output = pl.create_pipeline(preprocessor,model)
     return output
 print("model creater loaded")
-def tune_model(model,param_grid):
-
-    """param_grid = {
+"""param_grid = {
     "C":  [1.0,0.5,0.6,0.7,0.8,0.9,1.1,1.2,1.3,1.5],
     "kernel" : ["rbf","poly","linear"],
     "gamma" : "scale"}"""
-    total_sum = 1
-    for i in param_grid:
-        total_sum = total_sum * len(param_grid[i])
-    total_sum = total_sum*5
 
-    grid_search = GridSearchCV(
-        model,
-        param_grid,
-        cv=5,
-        scoring="f1",
-        n_jobs=-1,
-        verbose= 0
-    )
-    raise grid_search
-    
 
 
 def tune_random_forest(rf_model, X_train, y_train):
@@ -64,5 +48,8 @@ def tune_random_forest(rf_model, X_train, y_train):
         verbose= 0
     )
 
+def tune_model(modelname):
+
+    pass
 
 print("model done import")

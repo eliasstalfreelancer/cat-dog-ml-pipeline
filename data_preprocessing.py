@@ -213,6 +213,57 @@ def merge_csv(path1, path2, output_path, name1, name2):
         )
 
         first = False
+
+def get_top_eff_and_score(df: pd.DataFrame):
+
+    best_score = df.sort_values(by="score", ascending=False)\
+    .groupby("feature_method").head(1)
+    best_effince = df.sort_values(by="efficiency", ascending=False)\
+        .groupby("feature_method").head(1)
+
+    
+    hog = best_score[best_score["feature_method"] == "HOG"]
+    model_name_hog = hog["model"].iloc[0]
+
+    lbp = best_score[best_score["feature_method"] == "LBP"]
+    model_name_LBP = lbp["model"].iloc[0]
+
+    hog_lbp = best_score[best_score["feature_method"] == "HOG_LBP"]
+    model_name_hog_lbp = hog_lbp["model"].iloc[0]
+
+    effincy_hog = best_effince[best_effince["feature_method"] == "HOG"]
+    effincy_model_name_hog = hog["model"].iloc[0]
+
+    effincy_lbp = best_effince[best_effince["feature_method"] == "LBP"]
+    effincy_model_name_LBP = lbp["model"].iloc[0]
+
+    effincy_hog_lbp = best_effince[best_effince["feature_method"] == "HOG_LBP"]
+    effincy_model_name_hog_lbp = hog_lbp["model"].iloc[0]
+
+    results = [
+    {
+        "feature": "HOG",
+        "best_score_model": model_name_hog,
+        "best_score": hog["score"].iloc[0],
+        "best_eff_model": effincy_model_name_hog,
+        "best_eff": effincy_hog["efficiency"].iloc[0]
+    },
+    {
+        "feature": "LBP",
+        "best_score_model": model_name_LBP,
+        "best_score": lbp["score"].iloc[0],
+        "best_eff_model": effincy_model_name_LBP,
+        "best_eff": effincy_lbp["efficiency"].iloc[0]
+    },
+    {
+        "feature": "HOG_LBP",
+        "best_score_model": model_name_hog_lbp,
+        "best_score": hog_lbp["score"].iloc[0],
+        "best_eff_model": effincy_model_name_hog_lbp,
+        "best_eff": effincy_hog_lbp["efficiency"].iloc[0]
+    }
+]
+    return results
 if __name__ == "__main__":
     print("starting ------------------------------------------------------------")
     list_of_feature_methods = {"HOG" : extract_HOG,"LBP":extract_lbp }

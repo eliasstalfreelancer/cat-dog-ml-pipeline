@@ -1,6 +1,7 @@
 print("starting imports")
 import pandas as pd
 import pipline as pl
+import model as ml
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 from sklearn.linear_model import PassiveAggressiveClassifier
@@ -72,15 +73,33 @@ traindata_data_desc = {
         "LBP": "data/shuffled_LBP.csv",
         "HOG_LBP": "data/shuffledHOG_LBP.csv",
     }
+
+nr = 0
+
 for name,traindata in traindata_data_desc.items():
-    pl.model_create_save_compare(list_of_models,"models/",name=name,data_path=traindata)
+    for model in list_of_models:
+        if not os.path.exists(f"models/{model}_{name}.pkl"):
+            print(f"models/{model}_{name}.pkl")
+            nr += 1
+
+if nr != 0:
+    print(f"nr: {nr}")
+    for name,traindata in traindata_data_desc.items():
+        pl.model_create_save_compare(list_of_models,"models/",name=name,data_path=traindata)
 
 print("starting model data proccesing")
 df = pd.read_csv("data/model_data.csv")
 df["time_seconds"] = df["time DD:HH:MM:SS"].apply(convert_to_seconds)
 df.loc[df["time_seconds"] == 0, "time_seconds"] = 1
 df["efficiency"] = df["score"] / df["time_seconds"]
-print(df.sort_values(by="efficiency", ascending=False).groupby("feature_method").head(1))
+#print(df.sort_values(by="efficiency", ascending=False).groupby("feature_method").head(1))
 df.to_csv("data/model_data.csv",index= False)
 candidates = dp.get_top_eff_and_score(df)
+for dics in candidates:
+    for model in dics.items():
+        print(model)
+        
+
+#print(candidates)
+
 
